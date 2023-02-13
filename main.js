@@ -1,10 +1,68 @@
 "use strict";
 
-const ttt = new function () {
-    this.restart = function () {
-        this.cells = new Array(9);
-        this.currentPlayer = 'X';
+function Cell(i) {
+    this.elem = document.querySelector("#c" + i);
+    this.get = () => this.elem.textContent;
+    this.set = (player) => this.elem.textContent = player;
+    this.mark = (markType) => {
+        this.elem.className = "";
+        if (!markType) {
+            return
+        }
+        if (markType == "win") {
+            this.elem.classList.add("win")
+            return
+        }
+        if (markType == "draw") {
+            this.elem.classList.add("draw")
+            return
+        }
     }
+    this.clear = () => {
+        this.set('');
+        this.mark(false);
+    }
+}
+
+function TTT() {
+    // --methods
+
+    this.doMove = function (cell) {
+        if (cell.get()) {
+            return false;
+        }
+        cell.set(this.currentPlayer)
+        return true;
+    };
+    this.nextPlayer = function () {
+        this.currentPlayer = this.currentPlayer == "X" ? "O" : "X";
+    };
+    this.getStatus = function () {
+        for (let c of this.combos) {
+            if (this.checkCombination(...c)) {
+                return c;
+            }
+        }
+        if (this.cells.every(v => v.get())) {
+            return [] // draw
+        }
+    };
+    this.checkCombination = function (i, j, k) {
+        return this.cells[i].get() &&
+            this.cells[i].get() == this.cells[j].get() &&
+            this.cells[j].get() == this.cells[k].get();
+    };
+    this.markCombination = function (c) {
+        for (let i of c) {
+            this.cells[i].mark("win")
+        }
+    }
+    this.markFilled = function () {
+        this.cells.forEach(v => v.mark("draw"))
+    }
+
+    // --init
+
     // 0 1 2
     // 3 4 5
     // 6 7 8
@@ -18,71 +76,48 @@ const ttt = new function () {
         [0, 4, 8],
         [2, 4, 6],
     ];
-    this.doMove = function (cellIndex) {
-        if (this.cells[cellIndex]) {
-            return false;
-        }
-        this.cells[cellIndex] = this.currentPlayer
-        return true;
-    };
-    this.nextPlayer = function () {
-        this.currentPlayer = this.currentPlayer == "X" ? "O" : "X";
-    };
-    this.getStatus = function () {
-        for (let c of this.combos) {
-            if (this.checkCombination(...c)) {
-                return c;
-            }
-        }
-    };
-    this.checkCombination = function (a, b, c) {
-        return this.cells[a] != undefined && this.cells[a] == this.cells[b] && this.cells[b] == this.cells[c];
-    };
-    this.setupHandlers = function () {
-        function toggleCombination(c) {
-            for (let i of c) {
-                cells[i].classList.toggle("marked")
-            }
-        }
-        const cells = [];
-        for (let i = 0; i < 9; i++) {
-            cells[i] = document.querySelector("#c" + i);
-        }
-        for (let i = 0; i < 9; i++) {
-            cells[i].onclick = () => {
-                if (this.getStatus()) {
-                    return;
-                }
-                if (this.doMove(i)) {
-                    cells[i].textContent = this.currentPlayer;
-                    this.nextPlayer()
-                }
-                let combo = this.getStatus();
-                if (combo) {
-                    toggleCombination(combo);
-                }
-            }
-        }
-        let winState = false;
-        const table = document.querySelector("table");
-        table.onclick = () => {
-            if (winState) {
-                toggleCombination(this.getStatus())
-                for (let c of cells) {
-                    c.textContent = ""
-                }
-                this.restart()
-                winState = false;
-                return;
-            }
-            if (this.getStatus()) {
-                winState = true;
-                return;
-            }
-        }
-    };
+    this.cells = []
+    for (let i = 0; i < 9; i++) {
+        this.cells[i] = new Cell(i);
+    }
+    this.table = document.querySelector("table");
 
-    this.restart();
+    this.restart = function () {
+        this.currentPlayer = 'X';
+        for (let c of this.cells) {
+            c.clear();
+        }
+        this.endState = false;
+    }
+    this.restart()
+
+    for (let c of this.cells) {
+        c.elem.onclick = () => {
+            if (this.getStatus()) {
+                return;
+            }
+            if (this.doMove(c)) {
+                this.nextPlayer()
+            }
+            let combo = this.getStatus();
+            if (combo == undefined) {
+                return
+            } else if (combo.length) {
+                this.markCombination(combo);
+            } else {
+                this.markFilled();
+            }
+        }
+    }
+    this.table.onclick = () => {
+        if (this.endState) {
+            this.restart()
+        } else if (this.getStatus()) {
+            this.endState = true;
+        }
+    }
+
 }
 
-ttt.setupHandlers()
+// run game
+new TTT();
