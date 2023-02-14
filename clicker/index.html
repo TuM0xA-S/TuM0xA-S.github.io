@@ -1,0 +1,146 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Clicker</title>
+    <style>
+        #table-container table,
+        #table-container tr,
+        #table-container td {
+            border: solid;
+            border-collapse: collapse;
+        }
+
+        #table-container td {
+            width: 50px;
+            height: 50px;
+        }
+
+        #table-container {
+            margin-left: 50px;
+        }
+
+        #setting-apply {
+            padding: 10px;
+        }
+
+        #settings input {
+            width: 100%;
+        }
+
+        body {
+            margin-top: 20px;
+            display: flex;
+        }
+
+        #metrics {
+            margin-top: 20px;
+        }
+
+        .marked {
+            background-color: red;
+        }
+
+        .table-endgame {
+            background-color: lightgray;
+        }
+    </style>
+</head>
+
+<body>
+    <div id="sidebar">
+        <div id="settings">
+            <table>
+                <tr>
+                    <td>
+                        <label for="setting-count-horizontal">cell count horizontal:</label>
+                    </td>
+                    <td>
+                        <input type="number" id="setting-count-horizontal" min="1" max="1000" value="3">
+                    </td>
+                </tr>
+                <tr>
+                    <td>
+                        <label for="setting-count-vertical">cell count vertical:</label>
+                    </td>
+                    <td>
+                        <input type="number" id="setting-count-vertical" min="1" max="1000" value="3">
+                    </td>
+                </tr>
+                <tr>
+                    <td>
+                        <label for="setting-cell-size">cell size(px):</label>
+                    </td>
+                    <td>
+                        <input type="number" id="setting-cell-size" min="1" max="500" value="50">
+                    </td>
+                </tr>
+                <tr>
+                    <td>
+                        <label for="setting-click-count">click count:</label>
+                    </td>
+                    <td>
+                        <input type="number" id="setting-click-count" min="1" max="1000" value="10">
+                    </td>
+                </tr>
+                <tr>
+                    <td>
+                        <label for="setting-simultaneously-count">simultaneous count:</label>
+                    </td>
+                    <td>
+                        <input type="number" id="setting-simultaneously-count" min="1" max="1000" value="2">
+                    </td>
+                </tr>
+                <tr>
+                    <td colspan="2">
+                        <input type="button" id="setting-apply" value="start">
+                    </td>
+                </tr>
+            </table>
+            <table id="metrics">
+                <tr>
+                    <td>clicks made:</td>
+                    <td id="metrics-click-count">0</td>
+                </tr>
+                <tr>
+                    <td>last time(s):</td>
+                    <td id="metrics-last-time">0</td>
+                </tr>
+                <tr>
+                    <td>avg time(s):</td>
+                    <td id="metrics-average-time">0</td>
+                </tr>
+                <tr>
+                    <td>total time(s):</td>
+                    <td id="metrics-total-time">0</td>
+                </tr>
+            </table>
+        </div>
+    </div>
+
+    <div id="table-container">
+        <table class="table-endgame">
+            <tr>
+                <td></td>
+                <td></td>
+                <td></td>
+            </tr>
+            <tr>
+                <td></td>
+                <td></td>
+                <td></td>
+            </tr>
+            <tr>
+                <td></td>
+                <td></td>
+                <td></td>
+            </tr>
+        </table>
+    </div>
+    <script src="main.js"></script>
+</body>
+
+</html>
