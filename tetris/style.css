@@ -1,0 +1,77 @@
+body {
+    font-family: monospace;
+}
+
+#header {
+    font-size: 2.0rem;
+    text-align: center;
+}
+
+#main-container {
+    display: flex;
+    margin: auto;
+}
+
+.next-figure-grid {
+    margin-bottom: 30px;
+}
+
+table,
+td,
+tr {
+    border: 1px solid black;
+    border-collapse: collapse;
+}
+
+td {
+    width: 30px;
+    height: 30px;
+}
+
+.game-grid {
+    margin-right: 30px;
+}
+
+#game-body {
+    display: flex;
+    justify-content: space-around;
+}
+
+.metric-tag {
+    font-size: 1.2rem;
+}
+
+.metric-value {
+    font-size: 1.5rem;
+
+}
+
+
+/* figure styles */
+.cube {
+    background-color: red;
+}
+
+.bar {
+    background-color: blue;
+}
+
+.rboot {
+    background-color: green;
+}
+
+.lboot {
+    background-color: violet;
+}
+
+.tform {
+    background-color: lightblue;
+}
+
+.lzed {
+    background-color: yellow;
+}
+
+.rzed {
+    background-color: orange;
+}
