@@ -16,6 +16,10 @@ body {
     margin-bottom: 30px;
 }
 
+.metric-value {
+    margin-left: 10px;
+}
+
 table,
 td,
 tr {

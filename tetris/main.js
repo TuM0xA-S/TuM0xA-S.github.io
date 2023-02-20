@@ -28,6 +28,11 @@ class Grid {
         cell.className = "tagged " + tag;
     }
     setFrom(grid) {
+        for (let i = 0; i < this.n; i++) {
+            for (let j = 0; j < this.m; j++) {
+                this.set(i, j, null);
+            }
+        }
         for (let i = 0; i < grid.length; i++) {
             for (let j = 0; j < grid[0].length; j++) {
                 this.set(i, j, grid[i][j]);
@@ -40,7 +45,7 @@ const TETRIS_GRID_ROWS = 20;
 const TETRIS_GRID_COLS = 10;
 const FIGURE_GRID_ROWS = 4;
 const FIGURE_GRID_COLS = 4;
-
+const TETRIS_LINES_PER_LEVEL = 20;
 // tag used as css class for coloring
 // через дроч размеров матрицы можно менять центр прокрутки
 // типо заполнять нулями чтобы центр прокрутки в центре матрицы
@@ -49,7 +54,7 @@ const FIGURE_GRID_COLS = 4;
 // и дальше каждая игра как новая
 const figures = [
     {
-        tag: "fcube",
+        tag: "cube",
         geom: [
             [1, 1],
             [1, 1],
@@ -133,7 +138,9 @@ class Figure {
                 rot[j][i] = this.geom[i][j];
             }
         }
-        // mirroring row->rot
+        // чтобы крутить налево
+        // rot.reverse();
+        // rotate right
         for (let row of rot) {
             row.reverse();
         }
@@ -162,6 +169,7 @@ class Tetris {
         this.nextFig = null;
         this.newNextFigure();
         this.spawnFigure();
+        this.newNextFigure();
     }
     getScore() {
         return this.score;
@@ -185,7 +193,7 @@ class Tetris {
         return grid;
     }
     getNextFigure() {
-
+        return this.nextFig.geom;
     }
     update() {
         if (this.lose || !this.fall()) {
@@ -193,8 +201,8 @@ class Tetris {
         }
         this.freezeFigure();
         this.processLines();
-        this.newNextFigure();
         this.spawnFigure();
+        this.newNextFigure();
         if (this.checkCollision()) {
             this.lose = true;
         }
@@ -226,6 +234,10 @@ class Tetris {
         }
 
         this.grid = grid.concat(this.grid.filter((v, i) => !filledLines[i]));
+
+        if (this.lines % TETRIS_LINES_PER_LEVEL == 0) {
+            this.level++;
+        }
     }
     freezeFigure(grid) {
         if (!grid) {
@@ -307,9 +319,30 @@ function randIntN(n) {
     return Math.trunc(Math.random() * n);
 }
 
-const gameGrid = new Grid(20, 10);
+const gameMetrics = {
+    level: document.querySelector("#metric-level"),
+    score: document.querySelector("#metric-score"),
+    lines: document.querySelector("#metric-lines"),
+    setScore(v) {
+        this.score.textContent = v;
+        return this;
+    },
+    setLevel(v) {
+        this.level.textContent = v;
+        return this;
+    },
+    setLines(v) {
+        this.lines.textContent = v;
+        return this;
+    },
+}
+
+const gameGrid = new Grid(TETRIS_GRID_ROWS, TETRIS_GRID_COLS);
 document.querySelector(".game-grid").append(gameGrid.getElement());
-const nextFigureGrid = new Grid(4, 4);
+
+const maxSide = figures.reduce((max, { geom }) => Math.max(max, geom.length, geom[0].length), 0)
+
+const nextFigureGrid = new Grid(maxSide, maxSide);
 document.querySelector(".next-figure-grid").append(nextFigureGrid.getElement());
 
 
@@ -336,6 +369,11 @@ document.body.onkeydown = function (e) {
 
 function draw() {
     gameGrid.setFrom(tetris.getGrid());
+    nextFigureGrid.setFrom(tetris.getNextFigure());
+    gameMetrics.
+        setScore(tetris.getScore()).
+        setLines(tetris.getLines()).
+        setLevel(tetris.getLevel());
 }
 
 draw();
