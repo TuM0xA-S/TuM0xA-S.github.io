@@ -10,6 +10,7 @@ class Grid {
             table.append(row);
             for (let j = 0; j < m; j++) {
                 const cell = document.createElement("td");
+                cell.append(document.createElement("div"));
                 row.append(cell);
             }
         }
@@ -19,12 +20,12 @@ class Grid {
         return this.grid;
     }
     set(row, col, tag) {
-        const cell = this.grid.rows[row].cells[col];
+        const cell = this.grid.rows[row].cells[col].firstElementChild;
         if (!tag) {
             cell.className = "";
             return;
         }
-        cell.className = tag;
+        cell.className = "tagged " + tag;
     }
     setFrom(grid) {
         for (let i = 0; i < grid.length; i++) {
@@ -41,9 +42,14 @@ const FIGURE_GRID_ROWS = 4;
 const FIGURE_GRID_COLS = 4;
 
 // tag used as css class for coloring
+// через дроч размеров матрицы можно менять центр прокрутки
+// типо заполнять нулями чтобы центр прокрутки в центре матрицы
+// топ идея добавить интерфейс добавления фигур
+// чтобы можно было открыть список поменять фигуры удалить добавить новые
+// и дальше каждая игра как новая
 const figures = [
     {
-        tag: "cube",
+        tag: "fcube",
         geom: [
             [1, 1],
             [1, 1],
@@ -60,43 +66,43 @@ const figures = [
     {
         tag: "rboot",
         geom: [
-            [1, 0, 0],
-            [1, 0, 0],
-            [1, 1, 0],
+            [0, 1, 0],
+            [0, 1, 0],
+            [0, 1, 1],
         ]
     },
     {
         tag: "lboot",
         geom: [
-            [0, 0, 1],
-            [0, 0, 1],
-            [0, 1, 1],
+            [0, 1, 0,],
+            [0, 1, 0,],
+            [1, 1, 0,],
         ]
     },
-    // {
-    //     tag: "tform",
-    //     geom: [
-    //         [0, 1, 0],
-    //         [0, 1, 0],
-    //         [1, 1, 1],
-    //     ]
-    // },
-    // {
-    //     tag: "lzed",
-    //     geom: [
-    //         [1, 1, 0],
-    //         [0, 1, 1],
-    //         [0, 0, 0],
-    //     ]
-    // },
-    // {
-    //     tag: "rzed",
-    //     geom: [
-    //         [0, 1, 1],
-    //         [1, 1, 0],
-    //         [0, 0, 0],
-    //     ]
-    // },
+    {
+        tag: "tform",
+        geom: [
+            [0, 1, 0],
+            [1, 1, 1],
+            [0, 0, 0],
+        ]
+    },
+    {
+        tag: "lzed",
+        geom: [
+            [1, 1, 0],
+            [0, 1, 1],
+            [0, 0, 0],
+        ]
+    },
+    {
+        tag: "rzed",
+        geom: [
+            [0, 1, 1],
+            [1, 1, 0],
+            [0, 0, 0],
+        ]
+    },
 ];
 
 class Figure {
@@ -331,6 +337,8 @@ document.body.onkeydown = function (e) {
 function draw() {
     gameGrid.setFrom(tetris.getGrid());
 }
+
+draw();
 
 let timerId = setInterval(() => {
     draw();

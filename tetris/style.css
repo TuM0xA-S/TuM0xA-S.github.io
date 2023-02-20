@@ -26,6 +26,13 @@ tr {
 td {
     width: 30px;
     height: 30px;
+    padding: 0px;
+}
+
+td div {
+    width: 30px;
+    height: 30px;
+    border: 2px solid white;
 }
 
 .game-grid {
@@ -46,6 +53,11 @@ td {
 
 }
 
+.tagged {
+    background-color: gray;
+    border: 2px black solid;
+    border-radius: 5px;
+}
 
 /* figure styles */
 .cube {
