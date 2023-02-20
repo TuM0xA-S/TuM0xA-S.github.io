@@ -160,6 +160,7 @@ class Tetris {
         this.lines = 0;
         this.level = 1;
         this.grid = [];
+        this.canMove = true;
         this.lose = false;
         this.gotNewLevel = false;
         for (let i = 0; i < this.n; i++) {
@@ -274,6 +275,7 @@ class Tetris {
         this.curFig = this.nextFig;
         this.coords.row = 0;
         this.coords.col = Math.trunc(this.m / 2 - this.curFig.m / 2);
+        this.canMove = true;
     }
     fall() {
         if (this.checkCollision(this.curFig, { row: this.coords.row + 1 })) {
@@ -316,18 +318,18 @@ class Tetris {
         }
     }
     moveLeft() {
-        if (!this.checkCollision(this.curFig, { col: this.coords.col - 1 })) {
+        if (this.canMove && !this.checkCollision(this.curFig, { col: this.coords.col - 1 })) {
             this.coords.col--;
         }
     }
     moveRight() {
-        if (!this.checkCollision(this.curFig, { col: this.coords.col + 1 })) {
+        if (this.canMove && !this.checkCollision(this.curFig, { col: this.coords.col + 1 })) {
             this.coords.col++;
         }
     }
     instantFall() {
         while (!this.fall());
-        this.update();
+        this.canMove = true;
     }
 }
 
