@@ -241,7 +241,7 @@ class Tetris {
         this.grid = grid.concat(this.grid.filter((v, i) => !filledLines[i]));
 
         this.gotNewLevel = false;
-        const newLevel = this.lines / TETRIS_LINES_PER_LEVEL;
+        const newLevel = 1 + Math.trunc(this.lines / TETRIS_LINES_PER_LEVEL);
         if (newLevel > this.level) {
             this.level = newLevel;
             this.gotNewLevel = true;
