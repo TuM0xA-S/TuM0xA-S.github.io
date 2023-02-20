@@ -329,7 +329,7 @@ class Tetris {
     }
     instantFall() {
         while (!this.fall());
-        this.canMove = true;
+        this.canMove = false;
     }
 }
 
