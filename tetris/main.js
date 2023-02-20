@@ -347,9 +347,13 @@ document.querySelector(".next-figure-grid").append(nextFigureGrid.getElement());
 
 
 
-const tetris = new Tetris();
+let tetris;
+let timerId;
 
 document.body.onkeydown = function (e) {
+    if (!timerId) {
+        return;
+    }
     if (e.code == "ArrowLeft") {
         tetris.moveLeft();
     }
@@ -376,12 +380,16 @@ function draw() {
         setLevel(tetris.getLevel());
 }
 
-draw();
-
-let timerId = setInterval(() => {
+document.querySelector("#start-button").onclick = function () {
+    clearInterval(timerId);
+    this.textContent = "↺";
+    tetris = new Tetris();
     draw();
-    tetris.update();
-    if (!tetris.isPlaying()) {
-        clearInterval(timerId)
-    }
-}, 200)
+    timerId = setInterval(() => {
+        draw();
+        tetris.update();
+        if (!tetris.isPlaying()) {
+            clearInterval(timerId)
+        }
+    }, 200)
+}
