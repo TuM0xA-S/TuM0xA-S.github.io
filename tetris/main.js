@@ -43,9 +43,12 @@ class Grid {
 
 const TETRIS_GRID_ROWS = 20;
 const TETRIS_GRID_COLS = 10;
-const FIGURE_GRID_ROWS = 4;
-const FIGURE_GRID_COLS = 4;
+const TETRIS_FIGURE_GRID_SIZE = 4;
 const TETRIS_LINES_PER_LEVEL = 20;
+const TETRIS_BASE_TIME = 400;
+const TETRIS_MIN_TIME = 50;
+const TETRIS_TIME_STEP = 20;
+
 // tag used as css class for coloring
 // через дроч размеров матрицы можно менять центр прокрутки
 // типо заполнять нулями чтобы центр прокрутки в центре матрицы
@@ -158,6 +161,7 @@ class Tetris {
         this.level = 1;
         this.grid = [];
         this.lose = false;
+        this.gotNewLevel = false;
         for (let i = 0; i < this.n; i++) {
             this.grid.push(new Array(this.m).fill(null));
         }
@@ -235,9 +239,15 @@ class Tetris {
 
         this.grid = grid.concat(this.grid.filter((v, i) => !filledLines[i]));
 
-        if (this.lines % TETRIS_LINES_PER_LEVEL == 0) {
-            this.level++;
+        this.gotNewLevel = false;
+        const newLevel = this.lines / TETRIS_LINES_PER_LEVEL;
+        if (newLevel > this.level) {
+            this.level = newLevel;
+            this.gotNewLevel = true;
         }
+    }
+    isNewLevel() {
+        return this.gotNewLevel;
     }
     freezeFigure(grid) {
         if (!grid) {
@@ -250,9 +260,6 @@ class Tetris {
                 }
             }
         }
-    }
-    getResult() {
-
     }
     newNextFigure() {
         const fig = figures[randIntN(figures.length)];
@@ -313,6 +320,10 @@ class Tetris {
             this.coords.col++;
         }
     }
+    instantFall() {
+        while (!this.fall());
+        this.update();
+    }
 }
 
 function randIntN(n) {
@@ -340,7 +351,7 @@ const gameMetrics = {
 const gameGrid = new Grid(TETRIS_GRID_ROWS, TETRIS_GRID_COLS);
 document.querySelector(".game-grid").append(gameGrid.getElement());
 
-const maxSide = figures.reduce((max, { geom }) => Math.max(max, geom.length, geom[0].length), 0)
+const maxSide = Math.max(figures.reduce((max, { geom }) => Math.max(max, geom.length, geom[0].length), 0), TETRIS_FIGURE_GRID_SIZE)
 
 const nextFigureGrid = new Grid(maxSide, maxSide);
 document.querySelector(".next-figure-grid").append(nextFigureGrid.getElement());
@@ -349,9 +360,9 @@ document.querySelector(".next-figure-grid").append(nextFigureGrid.getElement());
 
 let tetris;
 let timerId;
-
+let paused = false;
 document.body.onkeydown = function (e) {
-    if (!timerId) {
+    if (!timerId || paused) {
         return;
     }
     if (e.code == "ArrowLeft") {
@@ -366,8 +377,12 @@ document.body.onkeydown = function (e) {
     if (e.code == "ArrowDown") {
         tetris.moveDown();
     }
+    if (e.code == "Space") {
+        tetris.instantFall();
+    }
     draw();
 };
+
 
 // document.body.focus();
 
@@ -380,16 +395,35 @@ function draw() {
         setLevel(tetris.getLevel());
 }
 
-document.querySelector("#start-button").onclick = function () {
+function calcNewTime(level) {
+    return Math.max(TETRIS_BASE_TIME - (tetris.getLevel() - 1) * TETRIS_TIME_STEP, TETRIS_MIN_TIME);
+}
+
+const startHandler = function () {
+    this.blur()
     clearInterval(timerId);
     this.textContent = "↺";
     tetris = new Tetris();
     draw();
-    timerId = setInterval(() => {
-        draw();
+    timerId = setInterval(function f() {
         tetris.update();
+        draw();
         if (!tetris.isPlaying()) {
-            clearInterval(timerId)
+            clearInterval(timerId);
+            timerId = null;
+            return;
         }
-    }, 200)
+        if (tetris.isNewLevel()) {
+            clearInterval(timerId);
+            timerId = setInterval(f, calcNewTime(tetris.getLevel()));
+        }
+    }, TETRIS_BASE_TIME)
 }
+
+const startButton = document.querySelector("#start-button");
+startButton.onclick = startHandler;
+document.body.addEventListener("keydown", function(e) {
+    if (e.code == "Enter") {
+        startHandler.bind(startButton)();
+    }
+})
