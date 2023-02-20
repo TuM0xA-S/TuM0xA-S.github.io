@@ -28,6 +28,18 @@ body {
     border: 1px solid black
 }
 
+#pause-button {
+    border-radius: 20px;
+    height: 100px;
+    font-size: 2rem;
+    margin-top: 10px;
+    border: 1px solid black
+}
+
+.activated-button {
+    background-color: gray;
+}
+
 #start-button:hover {
     background-color: lightgray;
 }

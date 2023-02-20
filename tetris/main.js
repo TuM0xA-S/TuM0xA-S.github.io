@@ -44,7 +44,7 @@ class Grid {
 const TETRIS_GRID_ROWS = 20;
 const TETRIS_GRID_COLS = 10;
 const TETRIS_FIGURE_GRID_SIZE = 4;
-const TETRIS_LINES_PER_LEVEL = 20;
+const TETRIS_LINES_PER_LEVEL = 10;
 const TETRIS_BASE_TIME = 400;
 const TETRIS_MIN_TIME = 50;
 const TETRIS_TIME_STEP = 20;
@@ -262,13 +262,18 @@ class Tetris {
         }
     }
     newNextFigure() {
-        const fig = figures[randIntN(figures.length)];
-        this.nextFig = new Figure(fig.geom, fig.tag);
+        const figRaw = figures[randIntN(figures.length)];
+        let fig = new Figure(figRaw.geom, figRaw.tag);
+        const spinCount = randIntN(4);
+        for (let i = 0; i < spinCount; i++) {
+            fig = fig.rotate();
+        }
+        this.nextFig = fig;
     }
     spawnFigure() {
         this.curFig = this.nextFig;
         this.coords.row = 0;
-        this.coords.col = randIntN(TETRIS_GRID_COLS - this.curFig.m + 1);
+        this.coords.col = Math.trunc(this.m / 2 - this.curFig.m / 2);
     }
     fall() {
         if (this.checkCollision(this.curFig, { row: this.coords.row + 1 })) {
@@ -356,7 +361,7 @@ const maxSide = Math.max(figures.reduce((max, { geom }) => Math.max(max, geom.le
 const nextFigureGrid = new Grid(maxSide, maxSide);
 document.querySelector(".next-figure-grid").append(nextFigureGrid.getElement());
 
-
+// --- bind game to ui
 
 let tetris;
 let timerId;
@@ -400,17 +405,25 @@ function calcNewTime(level) {
 }
 
 const startHandler = function () {
-    this.blur()
+    paused = false;
+    startButton.blur();
+    pauseButton.blur();
+    pauseButton.disabled = false;
+    pauseButton.classList.remove("activated-button");
     clearInterval(timerId);
-    this.textContent = "↺";
+    startButton.textContent = "↺";
     tetris = new Tetris();
     draw();
     timerId = setInterval(function f() {
+        if (paused) {
+            return;
+        }
         tetris.update();
         draw();
         if (!tetris.isPlaying()) {
             clearInterval(timerId);
             timerId = null;
+            pauseButton.disabled = true;
             return;
         }
         if (tetris.isNewLevel()) {
@@ -420,10 +433,23 @@ const startHandler = function () {
     }, TETRIS_BASE_TIME)
 }
 
+const pauseHandler = function () {
+    paused = !paused;
+    pauseButton.classList.toggle("activated-button");
+    pauseButton.blur();
+}
+
 const startButton = document.querySelector("#start-button");
+const pauseButton = document.querySelector("#pause-button")
+
 startButton.onclick = startHandler;
-document.body.addEventListener("keydown", function(e) {
+pauseButton.addEventListener("click", pauseHandler)
+
+document.body.addEventListener("keydown", function (e) {
     if (e.code == "Enter") {
-        startHandler.bind(startButton)();
+        startHandler();
+    }
+    if (e.code == "Pause") {
+        pauseHandler();
     }
 })
