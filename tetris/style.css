@@ -40,6 +40,15 @@ body {
     background-color: gray;
 }
 
+#pause-button:hover {
+    background-color: lightgray;
+}
+
+#pause-button.activated-button:hover {
+    background-color: gray;
+}
+
+
 #start-button:hover {
     background-color: lightgray;
 }
