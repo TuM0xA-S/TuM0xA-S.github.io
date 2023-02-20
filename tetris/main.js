@@ -106,9 +106,9 @@ const figures = [
     {
         tag: "rzed",
         geom: [
+            [0, 0, 0],
             [0, 1, 1],
             [1, 1, 0],
-            [0, 0, 0],
         ]
     },
 ];
@@ -273,7 +273,8 @@ class Tetris {
     }
     spawnFigure() {
         this.curFig = this.nextFig;
-        this.coords.row = 0;
+        // offset up on count of empty first lines in figure
+        this.coords.row = -this.curFig.geom.findIndex((r) => r.some(x => x));
         this.coords.col = Math.trunc(this.m / 2 - this.curFig.m / 2);
         this.canMove = true;
     }
